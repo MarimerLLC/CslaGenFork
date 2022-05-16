@@ -1,4 +1,4 @@
-<%@ CodeTemplate Inherits="CslaTemplateHelperCS" Language="CSharp" TargetLanguage="CSharp" Description="Generates a CSLA Editable Root Object." %>
+﻿<%@ CodeTemplate Inherits="CslaTemplateHelperCS" Language="CSharp" TargetLanguage="CSharp" Description="Generates a CSLA Editable Root Object." %>
 <%@ Property Name="Info" Type="CslaObjectInfo" Optional="false" Category="Business Object" Description="Definition of the EditableRoot Object to create." %>
 <%@ Property Name="Errors" Type="System.Text.StringBuilder" Optional="false" Category="Options" Description="Allows the template to return errors to master.cst" %>
 <%@ Property Name="Warnings" Type="System.Text.StringBuilder" Optional="false" Category="Options" Description="Allows the template to return warnings to master.cst" %>
@@ -80,10 +80,16 @@ namespace <%= GetContextObjectNamespace(Info, CurrentUnit, genStep) %>
 <!-- #include file="EditableRoot_Factory.asp" -->
 <%
         }
-        else
+        else if (CurrentUnit.GenerationParams.TargetIsCsla45)
         {
             %>
 <!-- #include file="EditableRoot_Factory-45.asp" -->
+<%
+        }
+        else
+        {
+            %>
+<!-- #include file="EditableRoot_Factory-5.asp" -->
 <%
         }
     }

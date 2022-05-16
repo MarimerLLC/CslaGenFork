@@ -91,6 +91,8 @@ namespace CslaGenerator.Util
                 case TypeCodeEx.DateTime:
                 case TypeCodeEx.SmartDate:
                 case TypeCodeEx.String:
+                case TypeCodeEx.ByteArray:
+                case TypeCodeEx.Object:
                     return true;
 
                 /*

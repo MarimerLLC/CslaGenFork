@@ -694,6 +694,7 @@ namespace CslaGenerator.Util.PropertyBags
                         (propertyName == "DbBindColumn" ||
                          propertyName == "DataAccess" ||
                          propertyName == "PrimaryKey" ||
+                         propertyName == "OutputParameter" ||
                          propertyName == "FKConstraint" ||
                          propertyName == "ParameterName"))
                         return false;

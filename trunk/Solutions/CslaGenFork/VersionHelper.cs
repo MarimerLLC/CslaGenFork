@@ -179,11 +179,12 @@ namespace CslaGenerator
             var newFileVersion = "4.0.6";
 
             var xmlFile = string.Empty;
-            for (var index = 1; index < FileLines.Length; index++)
-            {
-                var line = FileLines[index];
-                xmlFile += line;
-            }
+            //for (var index = 1; index < FileLines.Length; index++)
+            //{
+            //    var line = FileLines[index];
+            //    xmlFile += line;
+            //}
+            xmlFile = string.Concat(FileLines);
 
             XmlDocument xDoc = new XmlDocument();
             xDoc.PreserveWhitespace = true;
@@ -240,8 +241,8 @@ namespace CslaGenerator
                 }
             }
 
-            var firstline = FileLines[0];
-            FileLines = new[] {firstline, xDoc.InnerXml};
+            //var firstline = FileLines[0];
+            FileLines = new[] {xDoc.InnerXml};
 
             for (var index = 0; index < FileLines.Length; index++)
             {

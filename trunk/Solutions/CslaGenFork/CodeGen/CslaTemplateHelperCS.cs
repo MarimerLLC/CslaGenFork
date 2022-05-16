@@ -239,7 +239,7 @@ namespace CslaGenerator.CodeGen
                 if (info.DataSetLoadingScheme)
                     return GetDataSetLoaderStatement(prop);
 
-                if (CurrentUnit.GenerationParams.TargetIsCsla4DAL && CurrentUnit.GenerationParams.GenerateDTO)
+                if ((CurrentUnit.GenerationParams.TargetIsCsla4DAL || CurrentUnit.GenerationParams.TargetIsCsla5DAL) && CurrentUnit.GenerationParams.GenerateDTO)
                     return GetDtoLoaderStatement(prop);
 
                 return GetDataReaderLoaderStatement(prop);
@@ -387,7 +387,8 @@ namespace CslaGenerator.CodeGen
             TypeCodeEx propType = prop.PropertyType;
             try
             {
-                propType = (prop as ValueProperty).GetBackingFieldType();
+                if ((prop as ValueProperty) != null)
+                    propType = (prop as ValueProperty).GetBackingFieldType();
             }
             catch (Exception)
             {
@@ -802,6 +803,7 @@ namespace CslaGenerator.CodeGen
             }
 
             allNamespaces.AddRange(GetDalInterfaceNamespaces(info, unit));
+            allNamespaces.Add(GetDalUtilitiesNamespace(unit));
 
             foreach (var namespaceName in allNamespaces)
             {
@@ -876,7 +878,7 @@ namespace CslaGenerator.CodeGen
 
             // ignore if not usign DAL
             var dalInterfaceNamespaces = new List<string>();
-            if (unit.GenerationParams.TargetIsCsla4DAL && !isUnitOfWork)
+            if ((unit.GenerationParams.TargetIsCsla4DAL || unit.GenerationParams.TargetIsCsla5DAL) && !isUnitOfWork)
             {
                 dalInterfaceNamespaces.AddRange(GetDalInterfaceNamespaces(info, unit));
                 if (UseSilverlight())
@@ -950,7 +952,7 @@ namespace CslaGenerator.CodeGen
             if (!string.IsNullOrEmpty(info.UpdaterType) ||
                 (!UseSilverlight() &&
                  !isUnitOfWork &&
-                 CurrentUnit.GenerationParams.TargetIsCsla4DAL &&
+                 (CurrentUnit.GenerationParams.TargetIsCsla4DAL || CurrentUnit.GenerationParams.TargetIsCsla5DAL) &&
                  CurrentUnit.GenerationParams.GenerateDTO &&
                  !info.ObjectType.IsObjectType()))
             {
@@ -965,9 +967,9 @@ namespace CslaGenerator.CodeGen
 
             if (!UseSilverlight() && !isUnitOfWork)
             {
-                if (!unit.GenerationParams.TargetIsCsla4DAL || !unit.GenerationParams.GenerateDTO)
+                if ((!unit.GenerationParams.TargetIsCsla4DAL && !unit.GenerationParams.TargetIsCsla5DAL) || !unit.GenerationParams.GenerateDTO)
                     result.Add("System.Data");
-                if (!unit.GenerationParams.TargetIsCsla4DAL)
+                if (!unit.GenerationParams.TargetIsCsla4DAL && !unit.GenerationParams.TargetIsCsla5DAL)
                     result.AddRange(Namespaces);
             }
 
@@ -979,7 +981,7 @@ namespace CslaGenerator.CodeGen
             if (!UseSilverlight() && !isUnitOfWork)
             {
                 result.Add("Csla");
-                if (!unit.GenerationParams.TargetIsCsla4DAL || !unit.GenerationParams.GenerateDTO)
+                if ((!unit.GenerationParams.TargetIsCsla4DAL && !unit.GenerationParams.TargetIsCsla5DAL) || !unit.GenerationParams.GenerateDTO)
                     result.Add("Csla.Data");
                 if (contextUtilitiesnamespace != string.Empty)
                     result.Add(contextUtilitiesnamespace);
@@ -987,6 +989,15 @@ namespace CslaGenerator.CodeGen
             else
             {
                 result.Add("Csla");
+            }
+
+            if (unit.GenerationParams.TargetIsCsla50)
+            {
+                result.Add("System.ComponentModel");
+                result.Add("System.ComponentModel.DataAnnotations");
+                if (unit.GenerationParams.GenerateAsynchronous)
+                    result.Add("System.Threading.Tasks");
+
             }
 
             if (result.Contains(string.Empty))
@@ -1126,20 +1137,20 @@ namespace CslaGenerator.CodeGen
         {
             var result = new List<string>();
 
-            if (!unit.GenerationParams.TargetIsCsla4DAL || !unit.GenerationParams.GenerateDTO)
+            if ((!unit.GenerationParams.TargetIsCsla4DAL && !unit.GenerationParams.TargetIsCsla5DAL) || !unit.GenerationParams.GenerateDTO)
                 result.Add("System.Data");
 
-            if (!unit.GenerationParams.TargetIsCsla4DAL)
+            if (!unit.GenerationParams.TargetIsCsla4DAL && !unit.GenerationParams.TargetIsCsla5DAL)
                 result.AddRange(Namespaces);
 
             if (CurrentUnit.GenerationParams.GenerateDTO && !info.ObjectType.IsObjectType())
                 result.Add("System.Collections.Generic");
 
-            if (!unit.GenerationParams.TargetIsCsla4DAL || !unit.GenerationParams.GenerateDTO)
+            if ((!unit.GenerationParams.TargetIsCsla4DAL && !unit.GenerationParams.TargetIsCsla4DAL) || !unit.GenerationParams.GenerateDTO)
                 result.Add("Csla.Data");
             if (contextUtilitiesnamespace != string.Empty && !HasSilverlightLocalDataPortalCreate(info))
                 result.Add(contextUtilitiesnamespace);
-
+            
             if (result.Contains(string.Empty))
                 result.Remove(string.Empty);
 
@@ -1158,7 +1169,7 @@ namespace CslaGenerator.CodeGen
 
                 if (!usesDb)
                 {
-                    if (CurrentUnit.GenerationParams.TargetIsCsla4DAL && CurrentUnit.GenerationParams.GenerateDTO)
+                    if ((CurrentUnit.GenerationParams.TargetIsCsla4DAL || CurrentUnit.GenerationParams.TargetIsCsla5DAL) && CurrentUnit.GenerationParams.GenerateDTO)
                         result.Add(GetContextObjectNamespace(info, unit, GenerationStep.DalInterface));
 
                     return result;
@@ -1167,11 +1178,12 @@ namespace CslaGenerator.CodeGen
 
             result.Add(GetContextObjectNamespace(info, unit, GenerationStep.DalInterface));
 
-            if (info.IsNotUnitOfWork() &&
-                info.ObjectNamespace != CurrentUnit.GenerationParams.UtilitiesNamespace)
-            {
-                result.Add(GetDalInterfaceUtilitiesNamespace(unit));
-            }
+            // Commenting this out because we are no longer using anything in the DalInterface Utilities namespace
+            //if (info.IsNotUnitOfWork() &&
+            //    info.ObjectNamespace != CurrentUnit.GenerationParams.UtilitiesNamespace)
+            //{
+            //    result.Add(GetDalInterfaceUtilitiesNamespace(unit));
+            //}
 
             if (result.Contains(string.Empty))
                 result.Remove(string.Empty);
@@ -1211,6 +1223,25 @@ namespace CslaGenerator.CodeGen
         private static string GetDalInterfaceUtilitiesNamespace(CslaGeneratorUnit unit)
         {
             var result = AdvancedGenerator.GetContextBaseNamespace(unit, GenerationStep.DalInterface);
+            return result +
+                   unit.GenerationParams.UtilitiesNamespace.Substring(unit.GenerationParams.BaseNamespace.Length);
+        }
+
+        public static string GetDalInterfaceNamespace(CslaGeneratorUnit unit)
+        {
+            var result = AdvancedGenerator.GetContextBaseNamespace(unit, GenerationStep.DalInterface);
+            return result;
+        }
+
+        public static string GetDalNamespace(CslaGeneratorUnit unit)
+        {
+            var result = AdvancedGenerator.GetContextBaseNamespace(unit, GenerationStep.DalObject);
+            return result;
+        }
+
+        public static string GetDalUtilitiesNamespace(CslaGeneratorUnit unit)
+        {
+            var result = AdvancedGenerator.GetContextBaseNamespace(unit, GenerationStep.DalObject);
             return result +
                    unit.GenerationParams.UtilitiesNamespace.Substring(unit.GenerationParams.BaseNamespace.Length);
         }
@@ -2253,7 +2284,8 @@ namespace CslaGenerator.CodeGen
             TypeCodeEx propType = prop.PropertyType;
             try
             {
-                propType = (prop as ValueProperty).GetBackingFieldType();
+                if ((prop as ValueProperty) != null)
+                    propType = (prop as ValueProperty).GetBackingFieldType();
             }
             catch (Exception)
             {
@@ -2310,7 +2342,8 @@ namespace CslaGenerator.CodeGen
             var propType = prop.PropertyType;
             try
             {
-                propType = (prop as ValueProperty).GetBackingFieldType();
+                if ((prop as ValueProperty) != null)
+                    propType = (prop as ValueProperty).GetBackingFieldType();
             }
             catch (Exception)
             {
@@ -2595,17 +2628,18 @@ namespace CslaGenerator.CodeGen
             }
             response +=
                 String.Format(
-                    "{0} static readonly PropertyInfo<{1}> {2} = RegisterProperty<{1}>(p => {3}, \"{4}\"{5}{6});",
+                    "{0} static readonly PropertyInfo<{1}> {2} = RegisterProperty<{1}>(nameof({3}), \"{4}\"{5}{6});",
                     PropertyInfoVisibility(),
                     (prop.DeclarationMode == PropertyDeclaration.Managed ||
                      prop.DeclarationMode == PropertyDeclaration.Unmanaged)
                         ? GetDataTypeGeneric(prop, prop.PropertyType)
                         : GetDataTypeGeneric(prop, prop.BackingFieldType),
                     FormatPropertyInfoName(prop.Name),
-                    (String.IsNullOrEmpty(prop.Interfaces)
-                        ? "p." + FormatPascal(prop.Name)
-                        : "((" + prop.Interfaces.Substring(0, prop.Interfaces.LastIndexOf('.')) + ") p)." +
-                          FormatPascal(prop.Name)),
+                    FormatPascal(prop.Name),
+                    //(String.IsNullOrEmpty(prop.Interfaces)
+                    //    ? "p." + FormatPascal(prop.Name)
+                    //    : "((" + prop.Interfaces.Substring(0, prop.Interfaces.LastIndexOf('.')) + ") p)." +
+                    //      FormatPascal(prop.Name)),
                     prop.FriendlyName,
                     GetDefaultForPropertyInfoDeclare(info, prop),
                     GetRelationhipType(info, prop));
@@ -2718,14 +2752,15 @@ namespace CslaGenerator.CodeGen
             }
             response +=
                 String.Format(
-                    "{0} static readonly PropertyInfo<{1}> {2} = RegisterProperty<{1}>(p => {3}, \"{4}\"{5});",
+                    "{0} static readonly PropertyInfo<{1}> {2} = RegisterProperty<{1}>(nameof({3}), \"{4}\"{5});",
                     PropertyInfoVisibility(),
                     prop.TypeName,
                     FormatPropertyInfoName(prop.Name),
-                    (String.IsNullOrEmpty(prop.Interfaces)
-                        ? "p." + FormatPascal(prop.Name)
-                        : "((" + prop.Interfaces.Substring(0, prop.Interfaces.LastIndexOf('.')) + ") p)." +
-                          FormatPascal(prop.Name)),
+                    FormatPascal(prop.Name),
+                    //(String.IsNullOrEmpty(prop.Interfaces)
+                    //    ? "p." + FormatPascal(prop.Name)
+                    //    : "((" + prop.Interfaces.Substring(0, prop.Interfaces.LastIndexOf('.')) + ") p)." +
+                    //      FormatPascal(prop.Name)),
                     prop.FriendlyName,
                     GetRelationhipType(info, prop));
 
@@ -2823,7 +2858,7 @@ namespace CslaGenerator.CodeGen
             // "private static readonly PropertyInfo<{0}> {1} = RegisterProperty<{0}>(p => p.{2}, \"{3}\"{4});",
             var response =
                 String.Format(
-                    "{0} static readonly PropertyInfo<{1}> {2} = RegisterProperty<{1}>(p => p.{3}, \"{4}\");",
+                    "{0} static readonly PropertyInfo<{1}> {2} = RegisterProperty<{1}>(nameof({3}), \"{4}\");",
                     PropertyInfoVisibility(),
                     prop.TypeName,
                     FormatPropertyInfoName(prop.Name),
@@ -2873,7 +2908,7 @@ namespace CslaGenerator.CodeGen
 
             response +=
                 String.Format(
-                    "{0} static readonly PropertyInfo<{1}> {2} = RegisterProperty<{1}>(p => p.{3});",
+                    "{0} static readonly PropertyInfo<{1}> {2} = RegisterProperty<{1}>(nameof({3}));",
                     PropertyInfoVisibility(),
                     GetDataTypeGeneric(prop, prop.PropertyType),
                     FormatPropertyInfoName(prop.Name),
@@ -2923,7 +2958,7 @@ namespace CslaGenerator.CodeGen
 
             response +=
                 String.Format(
-                    "{0} static readonly PropertyInfo<{1}> {2} = RegisterProperty<{1}>(p => p.{3}, \"{4}\");",
+                    "{0} static readonly PropertyInfo<{1}> {2} = RegisterProperty<{1}>(nameof({3}), \"{4}\");",
                     PropertyInfoVisibility(),
                     prop.Type,
                     FormatPropertyInfoName(prop.Name),
@@ -2947,13 +2982,9 @@ namespace CslaGenerator.CodeGen
 
             if (prop.LazyLoad)
             {
-                response += ", RelationshipTypes.Child | RelationshipTypes.LazyLoad";
+                response += ", RelationshipTypes.LazyLoad";
             }
-            else
-            {
-                response += ", RelationshipTypes.Child";
-            }
-
+            
             if (prop.DeclarationMode == PropertyDeclaration.Unmanaged)
             {
                 response += " | RelationshipTypes.PrivateField";
@@ -2989,12 +3020,15 @@ namespace CslaGenerator.CodeGen
                 }
             }
 
+            string displayAttribute = GetDisplayAttribute(prop);
+
             if (prop.DeclarationMode == PropertyDeclaration.Managed ||
                 prop.DeclarationMode == PropertyDeclaration.Unmanaged ||
                 prop.DeclarationMode == PropertyDeclaration.ManagedWithTypeConversion ||
                 prop.DeclarationMode == PropertyDeclaration.UnmanagedWithTypeConversion)
             {
-                response = String.Format("{0}{1} {2}" + Environment.NewLine,
+                response = String.Format("{0}{1}{2} {3}" + Environment.NewLine,
+                    displayAttribute,
                     (String.IsNullOrEmpty(prop.Interfaces) ? GetPropertyAccess(prop) + " " : ""),
                     //GetDataTypeGeneric(prop, prop.PropertyType),
                     GetDataType(prop),
@@ -3009,7 +3043,8 @@ namespace CslaGenerator.CodeGen
             else if (prop.DeclarationMode == PropertyDeclaration.ClassicProperty ||
                      prop.DeclarationMode == PropertyDeclaration.ClassicPropertyWithTypeConversion)
             {
-                response += String.Format("{0}{1} {2}" + Environment.NewLine,
+                response += String.Format("{0}{1}{2} {3}" + Environment.NewLine,
+                    displayAttribute,
                     (String.IsNullOrEmpty(prop.Interfaces) ? GetPropertyAccess(prop) + " " : ""),
                     //GetDataTypeGeneric(prop, prop.PropertyType),
                     GetDataType(prop),
@@ -3023,7 +3058,8 @@ namespace CslaGenerator.CodeGen
             }
             else if (prop.DeclarationMode == PropertyDeclaration.AutoProperty)
             {
-                response += String.Format("{0}{1} {2} {{ get; {3}set; }}",
+                response += String.Format("{0}{1}{2} {3} {{ get; {4}set; }}",
+                    displayAttribute,
                     (String.IsNullOrEmpty(prop.Interfaces) ? GetPropertyAccess(prop) + " " : ""),
                     GetDataTypeGeneric(prop, prop.PropertyType),
                     (String.IsNullOrEmpty(prop.Interfaces) ? FormatPascal(prop.Name) : prop.Interfaces),
@@ -3032,6 +3068,17 @@ namespace CslaGenerator.CodeGen
             }
 
             return response;
+        }
+
+        private static string GetDisplayAttribute(ValueProperty prop)
+        {
+            // Add the display attribute for the friendly name
+            var displayAttribute = string.Empty;
+            if (String.IsNullOrEmpty(prop.Interfaces) && !String.IsNullOrEmpty(prop.FriendlyName))
+            {
+                displayAttribute = String.Format("[Display(Name = \"{0}\")]{1}        ", prop.FriendlyName, Environment.NewLine);
+            }
+            return displayAttribute;
         }
 
         public string PropertyConvertDeclare(CslaObjectInfo info, ConvertValueProperty prop)
@@ -3046,10 +3093,11 @@ namespace CslaGenerator.CodeGen
                 isReadOnly = true;
             }
 
-            response += String.Format("{0} {1} {2}" + Environment.NewLine,
+            response += String.Format("{0}{1} {2} {3}" + Environment.NewLine,
+                GetDisplayAttribute(prop),
                 GetPropertyAccess(prop),
                 GetDataTypeGeneric(prop, prop.PropertyType),
-                FormatPascal(prop.Name));
+                FormatPascal(prop.Name)); ;
             response += "        {" + Environment.NewLine;
             response += "            get" + Environment.NewLine;
             response += "            {" + Environment.NewLine;
@@ -4776,7 +4824,10 @@ namespace CslaGenerator.CodeGen
         public string GetConnection(CslaObjectInfo info, bool isFetch)
         {
             var database = "\"" + CurrentUnit.GenerationParams.DatabaseConnection + "\"";
-            if (CurrentUnit.GenerationParams.GenerateDatabaseClass)
+            if (CurrentUnit.GenerationParams.TargetIsCsla5DAL)
+                database = "_connectionString, false";
+
+            else if (CurrentUnit.GenerationParams.GenerateDatabaseClass)
                 database = "Database." + CurrentUnit.GenerationParams.DatabaseConnection + "Connection, false";
 
             var response = "using (var ctx = ";
@@ -5336,14 +5387,14 @@ namespace CslaGenerator.CodeGen
         public bool IsCriteriaClassNeeded(CslaObjectInfo info)
         {
             return (from crit in info.CriteriaObjects
-                where crit.Properties.Count > 1
+                where crit.Properties.Count > 1 && crit.CriteriaClassMode != CriteriaMode.MultiplePrimatives
                 select FactoryOrDataPortal(crit)).FirstOrDefault();
         }
 
         public bool IsCriteriaNestedClassNeeded(CslaObjectInfo info)
         {
             return (from crit in info.CriteriaObjects
-                where crit.Properties.Count > 1 && crit.NestedClass
+                where crit.Properties.Count > 1 && crit.NestedClass && crit.CriteriaClassMode != CriteriaMode.MultiplePrimatives
                 select FactoryOrDataPortal(crit)).FirstOrDefault();
         }
 
@@ -5353,7 +5404,8 @@ namespace CslaGenerator.CodeGen
                 where crit.Properties.Count > 1 &&
                       !crit.NestedClass &&
                       crit.CriteriaClassMode != CriteriaMode.BusinessBase &&
-                      crit.CriteriaClassMode != CriteriaMode.CustomCriteriaClass
+                      crit.CriteriaClassMode != CriteriaMode.CustomCriteriaClass &&
+                      crit.CriteriaClassMode != CriteriaMode.MultiplePrimatives
                 select FactoryOrDataPortal(crit)).FirstOrDefault();
         }
 
@@ -5397,7 +5449,7 @@ namespace CslaGenerator.CodeGen
             return sb.ToString();
         }
 
-        public string SendMultipleCriteria(Criteria crit, string prefix)
+        public string SendMultipleCriteria(Criteria crit, string prefix, bool usePrefix = true)
         {
             var sb = new StringBuilder();
             var firstParam = true;
@@ -5408,7 +5460,10 @@ namespace CslaGenerator.CodeGen
                     firstParam = false;
                 else
                     sb.Append(", ");
-                sb.AppendFormat("{0}.{1}", prefix, prop.Name);
+                if (usePrefix)
+                    sb.AppendFormat("{0}.{1}", prefix, prop.Name);
+                else
+                    sb.Append(FormatCamel(prop.Name));
             }
             return sb.ToString();
         }
@@ -5525,6 +5580,84 @@ namespace CslaGenerator.CodeGen
             paramName = FormatCamel(crit.Properties[0].Name);
             sb.AppendFormat(paramName);
 
+            return sb.ToString();
+        }
+
+        public string HookMultipleCriteria(Criteria crit)
+        {
+            var sb = new StringBuilder();
+            bool firstParam = true;
+            sb.Append("new { ");
+            foreach (var prop in crit.Properties)
+            {
+                if (firstParam)
+                    firstParam = false;
+                else
+                    sb.Append(", ");
+                var paramName = FormatCamel(prop.Name);
+                sb.AppendFormat("{0} = {1}", prop.Name, paramName);
+            }
+            sb.Append(" }");
+            return sb.ToString();
+        }
+
+        public string HookMultipleParameters(ValuePropertyCollection parentProperties, ValuePropertyCollection valueProperties)
+        {
+            var sb = new StringBuilder();
+            bool firstParam = true;
+            sb.Append("new { ");
+            if (parentProperties != null)
+            {
+                foreach (var prop in parentProperties)
+                {
+                    if (!prop.IsDatabaseBound)
+                        continue;
+
+                    if (firstParam)
+                        firstParam = false;
+                    else
+                        sb.Append(", ");
+                    var paramName = FormatCamel(prop.Name);
+                    sb.AppendFormat("{0} = {1}", prop.Name, paramName);
+                }
+            }
+
+            if (valueProperties != null)
+            {
+                foreach (var prop in valueProperties)
+                {
+                    if (!prop.IsDatabaseBound)
+                        continue;
+
+                    if (prop.PrimaryKey != ValueProperty.UserDefinedKeyBehaviour.Default)
+                    {
+
+                        if (firstParam)
+                            firstParam = false;
+                        else
+                            sb.Append(", ");
+
+                        var paramName = FormatCamel(prop.Name);
+                        sb.AppendFormat("{0} = {1}", prop.Name, paramName);
+                    }
+                }
+            }
+            
+            sb.Append(" }");
+            return sb.ToString();
+        }
+
+        public string HookSingleParameterKey(ValuePropertyCollection valueProperties)
+        {
+            var sb = new StringBuilder();
+
+            var primaryKey = valueProperties.Where(x => x.PrimaryKey != ValueProperty.UserDefinedKeyBehaviour.Default).FirstOrDefault();
+
+            if (primaryKey != null)
+            {
+                sb.AppendFormat(FormatCamel(primaryKey.Name));
+            }
+            
             return sb.ToString();
         }
 

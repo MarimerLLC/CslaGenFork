@@ -13,6 +13,10 @@ namespace CslaGenerator.Metadata
         [Description("CSLA 4.5")]
         CSLA45,
         [Description("CSLA 4.5 DAL")]
-        CSLA45DAL
+        CSLA45DAL,
+        [Description("CSLA 5.0")]
+        CSLA50,
+        [Description("CSLA 5.0 DAL")]
+        CSLA50DAL
     }
 }

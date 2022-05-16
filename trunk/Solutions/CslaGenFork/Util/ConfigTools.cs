@@ -97,7 +97,10 @@ namespace CslaGenerator.Util
             {
                 try
                 {
-                    response.Add(config.AppSettings.Settings["MruItem" + i].Value);
+                    if (config.AppSettings.Settings["MruItem" + i] != null)
+                    {
+                        response.Add(config.AppSettings.Settings["MruItem" + i].Value);
+                    }
                 }
                 catch (System.NullReferenceException)
                 {

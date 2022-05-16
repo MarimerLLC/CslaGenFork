@@ -403,7 +403,8 @@ namespace CslaGenerator.CodeGen
             TypeCodeEx propType = prop.PropertyType;
             try
             {
-                propType = (prop as ValueProperty).GetBackingFieldType();
+                if ((prop as ValueProperty) != null)
+                    propType = (prop as ValueProperty).GetBackingFieldType();
             }
             catch (Exception)
             {
@@ -2259,7 +2260,8 @@ namespace CslaGenerator.CodeGen
             TypeCodeEx propType = prop.PropertyType;
             try
             {
-                propType = (prop as ValueProperty).GetBackingFieldType();
+                if ((prop as ValueProperty) != null)
+                    propType = (prop as ValueProperty).GetBackingFieldType();
             }
             catch (Exception)
             {
@@ -2316,7 +2318,8 @@ namespace CslaGenerator.CodeGen
             var propType = prop.PropertyType;
             try
             {
-                propType = (prop as ValueProperty).GetBackingFieldType();
+                if ((prop as ValueProperty) != null)
+                    propType = (prop as ValueProperty).GetBackingFieldType();
             }
             catch (Exception)
             {
