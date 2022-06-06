@@ -1,0 +1,49 @@
+﻿<%@ CodeTemplate Inherits="CslaTemplateHelperCS" Language="CSharp" TargetLanguage="CSharp" Description="Generates a static Database class." %>
+<%@ Property Name="Info" Type="CslaObjectInfo" Optional="false" Category="Business Object" Description="Definition of the CSLA Object (just to get some project info)" %>
+<%@ Property Name="Errors" Type="System.Text.StringBuilder" Optional="false" Category="Options" Description="Allows the template to return errors to master.cst" %>
+<%@ Property Name="Warnings" Type="System.Text.StringBuilder" Optional="false" Category="Options" Description="Allows the template to return warnings to master.cst" %>
+<%@ Property Name="DalConfigList" Type="System.Collections.Generic.List<CslaObjectInfo>" Optional="false" Category="Business Object" Description="List of CSLA Objects having a generated DAL" %>
+
+<%@ Assembly Name="CslaGenerator" %>
+<%@ Import Namespace="CslaGenerator" %>
+<%@ Import Namespace="CslaGenerator.Metadata" %>
+<%@ Import Namespace="CslaGenerator.CodeGen" %>
+<%@ Import Namespace="CslaGenerator.Util" %>
+
+using System;
+using System.Collections.Generic;
+using System.Text;
+using Microsoft.Extensions.DependencyInjection;
+using <%= GetDalInterfaceNamespace(CurrentUnit) %>;
+using <%= GetDalNamespace(CurrentUnit) %>;
+
+
+namespace <%= GetContextUtilitiesNamespace(CurrentUnit, GenerationStep.DalObject) %>
+{
+    /// <summary>
+    /// Configuration Extension Methods for the DAL
+    /// </summary>
+    public static partial class ConfigurationExtensions
+    {
+        
+        /// <summary>
+        /// Adds all DALs to Services
+        /// </summary>
+        public static void AddDalSql(this IServiceCollection services, string connectionString)
+        {
+            services.AddSingleton<IDalConfig<%= GetDalName(CurrentUnit) %>, DalConfig<%= GetDalName(CurrentUnit) %>>(options => new DalConfig<%= GetDalName(CurrentUnit) %>(connectionString));
+            <% if (DalConfigList != null && DalConfigList.Count > 0)
+            {
+               foreach (var item in DalConfigList)
+                {
+                %>
+            services.AddTransient<I<%= item.ObjectName %>Dal, <%= item.ObjectName %>Dal>();
+                <%}
+            }
+                %>
+            OnAddDalSqlPost(services);
+        }
+        
+        static partial void OnAddDalSqlPost(IServiceCollection services);
+    }
+}

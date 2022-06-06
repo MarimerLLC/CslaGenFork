@@ -99,7 +99,7 @@ namespace CslaGenerator.Metadata
         }
 
         [Category("01. Definition")]
-        [Description("Whether this property can have a null value. The following types can't be null: \"ByteArray \", \"DBNull \", \"Object\" and \"Empty\".")]
+        [Description("Whether this property can have a null value. The following types can't be null:  \"DBNull \" and \"Empty\".")]
         public virtual bool Nullable
         {
             get

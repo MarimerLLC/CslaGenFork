@@ -129,7 +129,19 @@ namespace DBSchemaInfo.MsSql
             if (tempType == "hierarchyid")
                 tempType = "nvarchar";
 
-            return (SqlDbType)Enum.Parse(typeof(SqlDbType), tempType, true);
+            SqlDbType returnType;
+            try
+            {
+                returnType = (SqlDbType)Enum.Parse(typeof(SqlDbType), tempType, true);
+
+            }
+            catch (Exception ex)
+            {
+                // handle any user defined types here
+                returnType = SqlDbType.Udt;
+            }
+
+            return returnType;
         }
 
         public static string GetCondensedDataType(string nativeType, long columnLength, int columnScale)

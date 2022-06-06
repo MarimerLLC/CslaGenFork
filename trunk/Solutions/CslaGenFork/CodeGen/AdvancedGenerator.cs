@@ -129,6 +129,7 @@ namespace CslaGenerator.CodeGen
         private CslaGeneratorUnit _unit;
         private bool _businessError;
         private bool _currentSprocError;
+        private List<CslaObjectInfo> _dalConfigList;
 
         #endregion
 
@@ -175,9 +176,15 @@ namespace CslaGenerator.CodeGen
             TemplateHelper.SetDefaultDbProvider(generationParams);
             _generateDatabaseClass = generationParams.GenerateDatabaseClass;
             _abortRequested = false;
-            _fullTemplatesPath += _templatesDirectory + "CSLA40";
-            if (generationParams.TargetIsCsla4DAL)
-                _fullTemplatesPath += "DAL";
+            _fullTemplatesPath += _templatesDirectory;
+            if (generationParams.TargetIsCsla4)
+                _fullTemplatesPath += "CSLA40";
+            else if (generationParams.TargetIsCsla4DAL)
+                _fullTemplatesPath += "CSLA40DAL";
+            else if (generationParams.TargetIsCsla5)
+                _fullTemplatesPath += "CSLA50";
+            else if (generationParams.TargetIsCsla5DAL)
+                _fullTemplatesPath += "CSLA50DAL";
             _fullTemplatesPath += @"\";
             if (_recompileTemplates)
                 _templates = new Hashtable();
@@ -212,7 +219,7 @@ namespace CslaGenerator.CodeGen
 
             // add blank line
             OnGenerationInformation("");
-
+            _dalConfigList = new List<CslaObjectInfo>();
             foreach (var info in list)
             {
                 _businessError = false;
@@ -419,7 +426,16 @@ namespace CslaGenerator.CodeGen
 
             if (generationParams.GenerateDalObject)
             {
-                GenerateUtilityFile("DalManager" + dalName, false, "DalManager", GenerationStep.DalObject);
+                if (generationParams.TargetIsCsla5DAL)
+                {
+                    GenerateUtilityFile("IDalConfig" + dalName, false, "IDalConfig", GenerationStep.DalObject);
+                    GenerateUtilityFile("DalConfig" + dalName, false, "DalConfig", GenerationStep.DalObject);
+                    GenerateUtilityFile("DalConfigExtension" + dalName + _unit.GenerationParams.BaseFilenameSuffix, true, "DalConfigExtension", GenerationStep.DalObject);
+                    GenerateUtilityFile("DalConfigExtension" + dalName + _unit.GenerationParams.ExtendedFilenameSuffix, false, "ExtendedFile_DalConfigExtension", GenerationStep.DalObject);
+                    GenerateUtilityFile("DalHookArgs", false, "DalHookArgs", GenerationStep.DalObject);
+                }
+                else
+                    GenerateUtilityFile("DalManager" + dalName, false, "DalManager", GenerationStep.DalObject);
             }
             else
             {
@@ -1120,6 +1136,8 @@ namespace CslaGenerator.CodeGen
                 GenerateDalExtendedFile(extendedFileName, objInfo, step);
                 if (!string.IsNullOrEmpty(generationParams.ClassCommentFilenameSuffix))
                     GenerateDalClassCommentFile(classCommentFileName, objInfo, step);
+                if (step == GenerationStep.DalObject)
+                    _dalConfigList.Add(objInfo);
             }
             catch (Exception e)
             {
@@ -1198,6 +1216,7 @@ namespace CslaGenerator.CodeGen
                             template.SetProperty("Warnings", warningsOutput);
                             template.SetProperty("Infos", infosOutput);
                             template.SetProperty("CurrentUnit", _unit);
+                            template.SetProperty("DalConfigList", _dalConfigList);
                             OnGenerationInformation(utilityFilename + " file:");
                             OnGenerationFileName(fullFilename);
                             var fs = OpenFile(fullFilename);
@@ -1291,7 +1310,7 @@ namespace CslaGenerator.CodeGen
             }
 
             // use step for base folder to avoid the mess
-            if (_unit.GenerationParams.TargetIsCsla4DAL)
+            if (_unit.GenerationParams.TargetIsCsla4DAL || _unit.GenerationParams.TargetIsCsla5DAL)
                 result += step + @"\";
 
             if (!_unit.GenerationParams.UtilitiesFolder.Equals(string.Empty))
@@ -1999,11 +2018,40 @@ namespace CslaGenerator.CodeGen
 
                 if (_unit.GenerationParams.GenerateDalObject)
                 {
-                    if (_fileSuccess["DalManager" + dalName] == null)
-                        OutputWindow.Current.AddOutputInfo(
-                            string.Format("DalManager" + dalName + " class: already exists."));
-                    else if (_fileSuccess["DalManager" + dalName] == false)
-                        OutputWindow.Current.AddOutputInfo(string.Format("DalManager" + dalName + " class: failed."));
+                    if (_unit.GenerationParams.TargetIsCsla5DAL)
+                    {
+                        if (_fileSuccess["IDalConfig" + dalName] == null)
+                            OutputWindow.Current.AddOutputInfo(
+                                string.Format("IDalConfig" + dalName + " class: already exists."));
+                        else if (_fileSuccess["IDalConfig" + dalName] == false)
+                            OutputWindow.Current.AddOutputInfo(string.Format("IDalConfig" + dalName + " class: failed."));
+
+                        if (_fileSuccess["DalConfig" + dalName] == null)
+                            OutputWindow.Current.AddOutputInfo(
+                                string.Format("DalConfig" + dalName + " class: already exists."));
+                        else if (_fileSuccess["DalConfig" + dalName] == false)
+                            OutputWindow.Current.AddOutputInfo(string.Format("DalConfig" + dalName + " class: failed."));
+
+                        if (_fileSuccess["DalConfigExtension" + dalName + _unit.GenerationParams.BaseFilenameSuffix] == null)
+                            OutputWindow.Current.AddOutputInfo(
+                                string.Format("DalConfigExtension" + dalName + _unit.GenerationParams.BaseFilenameSuffix + " class: already exists."));
+                        else if (_fileSuccess["DalConfigExtension" + dalName + _unit.GenerationParams.BaseFilenameSuffix] == false)
+                            OutputWindow.Current.AddOutputInfo(string.Format("DalConfigExtension" + dalName + _unit.GenerationParams.BaseFilenameSuffix + " class: failed."));
+
+                        if (_fileSuccess["DalConfigExtension" + dalName + _unit.GenerationParams.ExtendedFilenameSuffix] == null)
+                            OutputWindow.Current.AddOutputInfo(
+                                string.Format("DalConfigExtension" + dalName + _unit.GenerationParams.ExtendedFilenameSuffix + " class: already exists."));
+                        else if (_fileSuccess["DalConfigExtension" + dalName + _unit.GenerationParams.ExtendedFilenameSuffix] == false)
+                            OutputWindow.Current.AddOutputInfo(string.Format("DalConfigExtension" + dalName + _unit.GenerationParams.ExtendedFilenameSuffix + " class: failed."));
+                    }
+                    else
+                    {
+                        if (_fileSuccess["DalManager" + dalName] == null)
+                            OutputWindow.Current.AddOutputInfo(
+                                string.Format("DalManager" + dalName + " class: already exists."));
+                        else if (_fileSuccess["DalManager" + dalName] == false)
+                            OutputWindow.Current.AddOutputInfo(string.Format("DalManager" + dalName + " class: failed."));
+                    }
                 }
 
                 if (_sprocWarnings > 0 || _objectWarnings > 0)

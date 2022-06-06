@@ -9,6 +9,7 @@ namespace CslaGenerator.Metadata
         Simple = 1,
         CriteriaBase,
         BusinessBase,
-        CustomCriteriaClass
+        CustomCriteriaClass,
+        MultiplePrimatives
     }
 }

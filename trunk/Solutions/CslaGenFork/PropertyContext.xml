@@ -519,7 +519,6 @@
     <add key="EditableRootCollection:UseParentProperties" value="false" />
     <add key="EditableRootCollection:AddParentReference" value="false" />
     <add key="EditableRootCollection:GenerateDataPortalInsert" value="false" />
-    <add key="EditableRootCollection:GenerateDataPortalUpdate" value="false" />
     <add key="EditableRootCollection:GenerateDataPortalDelete" value="false" />
     <add key="EditableRootCollection:SupportUpdateProperties" value="false" />
     <add key="EditableRootCollection:Singleton" value="false" />

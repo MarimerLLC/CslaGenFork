@@ -130,6 +130,9 @@ namespace CslaGenerator.CodeGen
 
         public static DbType GetDbType(this ValueProperty prop)
         {
+            if (prop.DbBindColumn == null || prop.DbBindColumn.ColumnOriginType == ColumnOriginType.None)
+                return GetDbType(prop.PropertyType);
+
             return GetDbType(prop.DbBindColumn);
         }
 

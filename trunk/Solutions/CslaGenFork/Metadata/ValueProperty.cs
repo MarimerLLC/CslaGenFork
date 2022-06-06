@@ -47,6 +47,15 @@ namespace CslaGenerator.Metadata
             DBProvidedPK
         }
 
+        [TypeConverter(typeof(EnumDescriptionOrCaseConverter))]
+        public enum OutputParameterBehaviour
+        {
+            Default,
+            InsertOnly,
+            UpdateOnly,
+            InsertAndUpdate
+        }
+
         internal static AuthorizationActions Convert(string actionProperty)
         {
             AuthorizationActions result;
@@ -81,6 +90,7 @@ namespace CslaGenerator.Metadata
         private string _fkConstraint = string.Empty;
         private bool _undoable = true;
         private string _defaultValue = string.Empty;
+        private string _outputParameterFunction = string.Empty;
         private string _friendlyName = string.Empty;
         private bool _isDatabaseBound = true;
         private string _customPropertyType = string.Empty;
@@ -95,6 +105,7 @@ namespace CslaGenerator.Metadata
         private PropertyAccess _access = PropertyAccess.IsPublic;
         private DataAccessBehaviour _dataAccess = DataAccessBehaviour.ReadWrite;
         private UserDefinedKeyBehaviour _primaryKey = UserDefinedKeyBehaviour.Default;
+        private OutputParameterBehaviour _outputParameter = OutputParameterBehaviour.Default;
         private AccessorVisibility _propSetAccessibility = AccessorVisibility.Default;
         private TypeCodeEx _backingFieldType = TypeCodeEx.Empty;
         private bool _nullable;
@@ -164,6 +175,24 @@ namespace CslaGenerator.Metadata
         {
             get { return _primaryKey; }
             set { _primaryKey = value; }
+        }
+
+        [Category("00. Database")]
+        [Description("Explicitly add an output parameter for this property")]
+        [UserFriendlyName("Ouput Parameter")]
+        public virtual OutputParameterBehaviour OutputParameter
+        {
+            get { return _outputParameter; }
+            set { _outputParameter = value; }
+        }
+
+        [Category("00. Database")]
+        [Description("Conversion function for the output parameter. NOTE: Use {val} as a placeholder for value passed into the function")]
+        [UserFriendlyName("Output Parameter Conversion Function")]
+        public virtual string OutputParameterFunction
+        {
+            get { return _outputParameterFunction; }
+            set { _outputParameterFunction = value; }
         }
 
         [Category("00. Database")]
