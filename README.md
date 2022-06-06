@@ -3,8 +3,18 @@ CslaGenFork
 
 ![](https://raw.github.com/CslaGenFork/CslaGenFork/master/Support/Logos/Project-Logo-final.gif)
 
-O/RM code generator for CSLA.NET 4.3/4.5/4.6 generating Stored Procedures, Business Layer and Data Access Layer code for Wisej, WinForms, ASP.NET, WPF and Silverlight.
+O/RM code generator for CSLA .NET  generating Stored Procedures, Business Layer and Data Access Layer code for Wisej, WinForms, ASP.NET, WPF and Silverlight.
+
+Targets CSLA 
+
+* 5 (most scenarios)
+* 4.3-4.6
+
 There is a complete set of C# templates. Currently there are VB templates, but only for non DAL architecture. You are welcome to contribute with VB templates for DAL DataReader and DAL using DTO.
+
+# 2022 Jun 06
+
+Some common CSLA 5 templates added. 
 
 # 2017 Mar 01 - Version 4.6.0 released ![](https://raw.github.com/CslaGenFork/CslaGenFork/master/Support/Home/Home_star.png)
 
