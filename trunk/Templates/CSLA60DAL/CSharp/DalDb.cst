@@ -1,0 +1,37 @@
+<%@ CodeTemplate Inherits="CslaTemplateHelperCS" Language="CSharp" TargetLanguage="CSharp" Description="Generates a static Database class." %>
+<%@ Property Name="Info" Type="CslaObjectInfo" Optional="false" Category="Business Object" Description="Definition of the CSLA Object (just to get some project info)" %>
+<%@ Property Name="Errors" Type="System.Text.StringBuilder" Optional="false" Category="Options" Description="Allows the template to return errors to master.cst" %>
+<%@ Property Name="Warnings" Type="System.Text.StringBuilder" Optional="false" Category="Options" Description="Allows the template to return warnings to master.cst" %>
+
+<%@ Assembly Name="CslaGenerator" %>
+<%@ Import Namespace="CslaGenerator" %>
+<%@ Import Namespace="CslaGenerator.Metadata" %>
+<%@ Import Namespace="CslaGenerator.CodeGen" %>
+<%@ Import Namespace="CslaGenerator.Util" %>
+
+using Microsoft.Data.SqlClient;
+using System;
+
+namespace <%= GetContextUtilitiesNamespace(CurrentUnit, GenerationStep.DalObject) %>
+{
+    /// <summary>
+    /// Defines the db connection for <%= GetDalName(CurrentUnit) %>
+    /// </summary>
+    public class <%= GetDalName(CurrentUnit) %>Db : DbProvider
+    {
+        private string ConnectionString { get; set; }
+
+        public <%= GetDalName(CurrentUnit) %>Db(string connectionString, int commandTimeout)
+        {
+            ConnectionString = connectionString;
+            CommandTimeout = commandTimeout;
+        }
+
+        public SqlConnection GetConnection()
+        {
+            SqlConnection conn = new SqlConnection(ConnectionString);
+            conn.Open();
+            return conn;
+        }
+    }
+}

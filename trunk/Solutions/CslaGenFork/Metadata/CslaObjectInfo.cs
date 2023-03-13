@@ -89,6 +89,7 @@ namespace CslaGenerator.Metadata
         private bool _generateDataPortalInsert = true;
         private bool _generateDataPortalUpdate = true;
         private bool _generateDataPortalDelete = true;
+        private bool _generateDataPortalDeleteSelf = true;
         private bool _supportUpdateProperties;
         private bool _addParentReference;
         private SimpleCacheResults _simpleCacheOptions = SimpleCacheResults.None;
@@ -227,8 +228,8 @@ namespace CslaGenerator.Metadata
         }
 
         [Category("00. Generate Options")]
-        [Description("Whether or not to generate DataPortal_ / Child_ Delete & DeleteSelf methods.")]
-        [UserFriendlyName("Generate Delete() and DeleteSelf() Methods")]
+        [Description("Whether or not to generate DataPortal_ / Child_ Delete method.")]
+        [UserFriendlyName("Generate Delete() Method")]
         public bool GenerateDataPortalDelete
         {
             get
@@ -240,6 +241,22 @@ namespace CslaGenerator.Metadata
                 return _generateDataPortalDelete;
             }
             set { _generateDataPortalDelete = value; }
+        }
+
+        [Category("00. Generate Options")]
+        [Description("Whether or not to generate DataPortal_ DeleteSelf method. NOTE: Generate Delete() Method must also be true if this is true.")]
+        [UserFriendlyName("Generate DeleteSelf() Method")]
+        public bool GenerateDataPortalDeleteSelf
+        {
+            get
+            {
+                if (ObjectType.IsReadOnlyObject() ||
+                    ObjectType.IsNameValueList() ||
+                    ObjectType.IsUnitOfWork())
+                    return false;
+                return _generateDataPortalDeleteSelf;
+            }
+            set { _generateDataPortalDeleteSelf = value; }
         }
 
         [Category("00. Generate Options")]

@@ -93,6 +93,7 @@ namespace CslaGenerator
             this.forceBackingFieldSmartDate = new System.Windows.Forms.ToolStripMenuItem();
             this.convertPropertiesAndCriteriaToSilverlight = new System.Windows.Forms.ToolStripMenuItem();
             this.convertProjectToNewPublicPolicy = new System.Windows.Forms.ToolStripMenuItem();
+            this.convertPersistenceTypeToDiSqlConnection = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator6 = new System.Windows.Forms.ToolStripSeparator();
             this.locateToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.codeSmithExtensionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -464,6 +465,7 @@ namespace CslaGenerator
             this.forceBackingFieldSmartDate,
             this.convertPropertiesAndCriteriaToSilverlight,
             this.convertProjectToNewPublicPolicy,
+            this.convertPersistenceTypeToDiSqlConnection,
             this.toolStripSeparator6,
             this.locateToolStripMenuItem,
             this.codeSmithExtensionToolStripMenuItem});
@@ -534,6 +536,14 @@ namespace CslaGenerator
             this.convertProjectToNewPublicPolicy.Size = new System.Drawing.Size(200, 22);
             this.convertProjectToNewPublicPolicy.Text = "Convert Constructors and PropertyInfo to Public";
             this.convertProjectToNewPublicPolicy.Click += new System.EventHandler(this.ConvertProjectToNewPublicPolicy_Click);
+            // 
+            // convertPersistenceTypeToDiSqlConnection
+            // 
+            this.convertPersistenceTypeToDiSqlConnection.Enabled = false;
+            this.convertPersistenceTypeToDiSqlConnection.Name = "convertPersistenceTypeToDiSqlConnection";
+            this.convertPersistenceTypeToDiSqlConnection.Size = new System.Drawing.Size(200, 22);
+            this.convertPersistenceTypeToDiSqlConnection.Text = "Convert Persistence Type to DI SQL Connection for all objects";
+            this.convertPersistenceTypeToDiSqlConnection.Click += new System.EventHandler(this.ConvertPersistenceTypeToDiSqlConnection);
             // 
             // toolStripSeparator6
             // 
@@ -1141,6 +1151,7 @@ namespace CslaGenerator
         private ToolStripMenuItem forceBackingFieldSmartDate;
         private ToolStripMenuItem convertPropertiesAndCriteriaToSilverlight;
         private ToolStripMenuItem convertProjectToNewPublicPolicy;
+        private ToolStripMenuItem convertPersistenceTypeToDiSqlConnection;
         private ToolStripSeparator toolStripSeparator6;
         private ToolStripMenuItem locateToolStripMenuItem;
         private ToolStripMenuItem codeSmithExtensionToolStripMenuItem;

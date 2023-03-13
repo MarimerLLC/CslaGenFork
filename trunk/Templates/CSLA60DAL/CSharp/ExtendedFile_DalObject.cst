@@ -1,0 +1,86 @@
+<%@ CodeTemplate Inherits="CslaTemplateHelperCS" Language="CSharp" TargetLanguage="CSharp" Description="Generates a CSLA Inherited Object." %>
+<%@ Property Name="Info" Type="CslaObjectInfo" Optional="false" Category="Business Object" Description="Definition of the CSLA Object to inherit from." %>
+<%@ Property Name="Errors" Type="System.Text.StringBuilder" Optional="false" Category="Options" Description="Allows the template to return errors to master.cst" %>
+<%@ Property Name="MethodList" Type="System.Collections.Generic.List<AdvancedGenerator.ServiceMethod>" Optional="false" Category="Options" Description="Allows the template to return a list a partial methods to master.cst (for Silverlight using services)" %>
+<%@ Property Name="InlineQueryList" Type="System.Collections.Generic.List<AdvancedGenerator.InlineQuery>" Optional="false" Category="Options" Description="Allows the template to return a list a inline queries to master.cst" %>
+
+<%@ Assembly Name="CslaGenerator" %>
+<%@ Import Namespace="CslaGenerator" %>
+<%@ Import Namespace="CslaGenerator.Metadata" %>
+<%@ Import Namespace="CslaGenerator.CodeGen" %>
+<%@ Import Namespace="CslaGenerator.Util" %>
+
+<!-- #include file="Header_DalObject.asp" -->
+using System;
+using Csla;
+<%
+if (CurrentUnit.GenerationParams.GenerateDTO)
+{
+    %>
+using <%= GetContextObjectNamespace(Info, CurrentUnit, GenerationStep.DalInterface) %>;
+using <%= GetDalUtilitiesNamespace(CurrentUnit) %>;
+<%
+}
+%>
+
+namespace <%= GetContextObjectNamespace(Info, CurrentUnit, GenerationStep.DalObject) %>
+{
+    public partial class <%= Info.ObjectName %>Dal
+    {
+	<%
+if (Info.IsNotUnitOfWork() && Info.IsNotBaseClass() && Info.IsNotCriteriaClass())
+{
+	System.Collections.Generic.List<string> hookList = GetHookList(Info);
+    if (hookList.Count > 0 && UseNoSilverlight())
+    {
+        %>
+		#region Implementation of Dal Hooks
+<%
+        if (UseBoth() && !HasSilverlightLocalDataPortalCreate(Info))
+        {
+            %>
+
+#if !SILVERLIGHT
+<%
+        }
+        foreach (string hookName in hookList)
+        {
+            %>
+
+        //partial void On<%= hookName %>(DalHookArgs args)
+        //{
+        //    throw new NotImplementedException();
+        //}
+        <%
+            if (hookName == "Create" && HasSilverlightLocalDataPortalCreate(Info))
+            {
+                %>
+
+#if !SILVERLIGHT
+        <%
+            }
+        }
+        if (UseBoth())
+        {
+            %>
+
+#endif
+<%
+        }
+        %>
+
+        #endregion
+<%
+    }
+}
+%>
+        <%
+    if (InlineQueryList.Count > 0 && UseNoSilverlight())
+    {
+        %>
+<!-- #include file="InlineQueriesImplementation.asp" -->
+<%
+    }
+    %>
+    }
+}

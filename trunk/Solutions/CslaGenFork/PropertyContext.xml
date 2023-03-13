@@ -10,6 +10,7 @@
     <add key="PlaceHolder:GenerateDataPortalInsert" value="false" />
     <add key="PlaceHolder:GenerateDataPortalUpdate" value="false" />
     <add key="PlaceHolder:GenerateDataPortalDelete" value="false" />
+    <add key="PlaceHolder:GenerateDataPortalDeleteSelf" value="false" />
     <add key="PlaceHolder:GenerateSprocs" value="false" />
     <add key="PlaceHolder:GenerateInlineQueries" value="false" />
     <add key="PlaceHolder:DataSetLoadingScheme" value="false" />
@@ -84,6 +85,7 @@
     <add key="BaseClass:GenerateDataPortalInsert" value="false" />
     <add key="BaseClass:GenerateDataPortalUpdate" value="false" />
     <add key="BaseClass:GenerateDataPortalDelete" value="false" />
+    <add key="BaseClass:GenerateDataPortalDeleteSelf" value="false" />
     <add key="BaseClass:GenerateSprocs" value="false" />
     <add key="BaseClass:GenerateInlineQueries" value="false" />
     <add key="BaseClass:DataSetLoadingScheme" value="false" />
@@ -134,6 +136,7 @@
     <add key="CriteriaClass:GenerateDataPortalInsert" value="false" />
     <add key="CriteriaClass:GenerateDataPortalUpdate" value="false" />
     <add key="CriteriaClass:GenerateDataPortalDelete" value="false" />
+    <add key="CriteriaClass:GenerateDataPortalDeleteSelf" value="false" />
     <add key="CriteriaClass:GenerateSprocs" value="false" />
     <add key="CriteriaClass:GenerateInlineQueries" value="false" />
     <add key="CriteriaClass:DataSetLoadingScheme" value="false" />
@@ -186,6 +189,7 @@
     <add key="UnitOfWork:GenerateDataPortalInsert" value="false" />
     <add key="UnitOfWork:GenerateDataPortalUpdate" value="false" />
     <add key="UnitOfWork:GenerateDataPortalDelete" value="false" />
+    <add key="UnitOfWork:GenerateDataPortalDeleteSelf" value="false" />
     <add key="UnitOfWork:GenerateSprocs" value="false" />
     <add key="UnitOfWork:GenerateInlineQueries" value="false" />
     <add key="UnitOfWork:DataSetLoadingScheme" value="false" />
@@ -251,6 +255,7 @@
     <add key="NameValueList:GenerateDataPortalInsert" value="false" />
     <add key="NameValueList:GenerateDataPortalUpdate" value="false" />
     <add key="NameValueList:GenerateDataPortalDelete" value="false" />
+    <add key="NameValueList:GenerateDataPortalDeleteSelf" value="false" />
     <add key="NameValueList:DataSetLoadingScheme" value="false" />
     <add key="NameValueList:FileName" value="true" />
     <add key="NameValueList:InheritedTypeWinForms" value="false" />
@@ -301,6 +306,7 @@
     <add key="ReadOnlyCollection:GenerateDataPortalInsert" value="false" />
     <add key="ReadOnlyCollection:GenerateDataPortalUpdate" value="false" />
     <add key="ReadOnlyCollection:GenerateDataPortalDelete" value="false" />
+    <add key="ReadOnlyCollection:GenerateDataPortalDeleteSelf" value="false" />
     <add key="ReadOnlyCollection:IsGenericType" value="false" />
     <add key="ReadOnlyCollection:GenericArguments" value="false" />
     <add key="ReadOnlyCollection:CslaBaseClass" value="false" />
@@ -347,7 +353,7 @@
     <add key="ReadOnlyObject:GenerateDataPortalInsert" value="false" />
     <add key="ReadOnlyObject:GenerateDataPortalUpdate" value="false" />
     <add key="ReadOnlyObject:GenerateDataPortalDelete" value="false" />
-
+    <add key="ReadOnlyObject:GenerateDataPortalDeleteSelf" value="false" />
     <add key="ReadOnlyObject:InheritedTypeWinForms" value="false" />
     <add key="ReadOnlyObject:IsGenericType" value="false" />
     <add key="ReadOnlyObject:GenericArguments" value="false" />
@@ -413,6 +419,7 @@
     <add key="EditableChildCollection:GenerateDataPortalInsert" value="false" />
     <add key="EditableChildCollection:GenerateDataPortalUpdate" value="false" />
     <add key="EditableChildCollection:GenerateDataPortalDelete" value="false" />
+    <add key="EditableChildCollection:GenerateDataPortalDeleteSelf" value="false" />
     <add key="EditableChildCollection:UseUnitOfWorkType" value="false" />
     <add key="EditableChildCollection:IsGenericType" value="false" />
     <add key="EditableChildCollection:GenericArguments" value="false" />
@@ -520,6 +527,7 @@
     <add key="EditableRootCollection:AddParentReference" value="false" />
     <add key="EditableRootCollection:GenerateDataPortalInsert" value="false" />
     <add key="EditableRootCollection:GenerateDataPortalDelete" value="false" />
+    <add key="EditableRootCollection:GenerateDataPortalDeleteSelf" value="false" />
     <add key="EditableRootCollection:SupportUpdateProperties" value="false" />
     <add key="EditableRootCollection:Singleton" value="false" />
     <add key="EditableRootCollection:CheckRulesOnFetch" value="false" />
@@ -620,6 +628,7 @@
     <add key="DynamicEditableRootCollection:GenerateDataPortalInsert" value="false" />
     <add key="DynamicEditableRootCollection:GenerateDataPortalUpdate" value="false" />
     <add key="DynamicEditableRootCollection:GenerateDataPortalDelete" value="false" />
+    <add key="DynamicEditableRootCollection:GenerateDataPortalDeleteSelf" value="false" />
     <add key="DynamicEditableRootCollection:SupportUpdateProperties" value="false" />
     <add key="DynamicEditableRootCollection:Singleton" value="false" />
     <add key="DynamicEditableRootCollection:EditOnDemand" value="false" />
