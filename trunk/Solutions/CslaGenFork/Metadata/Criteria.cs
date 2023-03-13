@@ -21,6 +21,7 @@ namespace CslaGenerator.Metadata
         private string _remarks = String.Empty;
         private readonly CriteriaPropertyCollection _properties = new CriteriaPropertyCollection();
         private CriteriaMode _criteriaClassMode = CriteriaMode.Simple;
+        private CriteriaDataPortalGenerationParameter _dataPortalGenerationParameter = CriteriaDataPortalGenerationParameter.ApplicationContext;
         private bool _nestedClass = true;
         private CriteriaUsageParameter _createOptions = new CriteriaUsageParameter();
         private CriteriaUsageParameter _getOptions = new CriteriaUsageParameter();
@@ -108,6 +109,15 @@ namespace CslaGenerator.Metadata
         public CriteriaPropertyCollection Properties
         {
             get { return _properties; }
+        }
+
+        [Category("01. Definition")]
+        [Description("The type of parameter passed in to generate the DataPortal within the factory method")]
+        [UserFriendlyName("DataPortal Generation Parameter")]
+        public CriteriaDataPortalGenerationParameter DataPortalGenerationParameter
+        {
+            get { return _dataPortalGenerationParameter; }
+            set { _dataPortalGenerationParameter = value; }
         }
 
         #endregion

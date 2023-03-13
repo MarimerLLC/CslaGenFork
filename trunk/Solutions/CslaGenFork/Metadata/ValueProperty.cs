@@ -224,6 +224,25 @@ namespace CslaGenerator.Metadata
             set { _parameterName = value; }
         }
 
+        [Category("00. Database")]
+        [Description("The stored procedure parameter size.")]
+        [UserFriendlyName("Parameter Size")]
+        public string ParameterSize
+        {
+            get
+            {
+                if (_parameterSize.Equals(String.Empty))
+                {
+                    if (DbBindColumn.Size > 0)
+                        return DbBindColumn.Size.ToString();
+
+                    return string.Empty;
+                }
+                return _parameterSize;
+            }
+            set { _parameterSize = value; }
+        }
+
         #endregion
 
         #region 01. Definition

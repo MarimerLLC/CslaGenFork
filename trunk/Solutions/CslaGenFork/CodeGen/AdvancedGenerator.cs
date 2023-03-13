@@ -185,6 +185,10 @@ namespace CslaGenerator.CodeGen
                 _fullTemplatesPath += "CSLA50";
             else if (generationParams.TargetIsCsla5DAL)
                 _fullTemplatesPath += "CSLA50DAL";
+            else if (generationParams.TargetIsCsla6)
+                _fullTemplatesPath += "CSLA60";
+            else if (generationParams.TargetIsCsla6DAL)
+                _fullTemplatesPath += "CSLA60DAL";
             _fullTemplatesPath += @"\";
             if (_recompileTemplates)
                 _templates = new Hashtable();
@@ -426,13 +430,20 @@ namespace CslaGenerator.CodeGen
 
             if (generationParams.GenerateDalObject)
             {
-                if (generationParams.TargetIsCsla5DAL)
+                if (generationParams.TargetIsCsla5DAL || generationParams.TargetIsCsla6DAL)
                 {
                     GenerateUtilityFile("IDalConfig" + dalName, false, "IDalConfig", GenerationStep.DalObject);
                     GenerateUtilityFile("DalConfig" + dalName, false, "DalConfig", GenerationStep.DalObject);
                     GenerateUtilityFile("DalConfigExtension" + dalName + _unit.GenerationParams.BaseFilenameSuffix, true, "DalConfigExtension", GenerationStep.DalObject);
                     GenerateUtilityFile("DalConfigExtension" + dalName + _unit.GenerationParams.ExtendedFilenameSuffix, false, "ExtendedFile_DalConfigExtension", GenerationStep.DalObject);
                     GenerateUtilityFile("DalHookArgs", false, "DalHookArgs", GenerationStep.DalObject);
+
+                    var DICount = _dalConfigList.Where(f => f.PersistenceType == PersistenceType.DISqlConnection).Count();
+                    if (generationParams.TargetIsCsla6DAL && DICount > 0)
+                    {
+                        GenerateUtilityFile("DbProvider", false, "DbProvider", GenerationStep.DalObject);
+                        GenerateUtilityFile(dalName + "Db", false, "DalDb", GenerationStep.DalObject);
+                    }
                 }
                 else
                     GenerateUtilityFile("DalManager" + dalName, false, "DalManager", GenerationStep.DalObject);
@@ -1310,7 +1321,7 @@ namespace CslaGenerator.CodeGen
             }
 
             // use step for base folder to avoid the mess
-            if (_unit.GenerationParams.TargetIsCsla4DAL || _unit.GenerationParams.TargetIsCsla5DAL)
+            if (_unit.GenerationParams.TargetIsCsla4DAL || _unit.GenerationParams.TargetIsCsla5DAL || _unit.GenerationParams.TargetIsCsla6DAL)
                 result += step + @"\";
 
             if (!_unit.GenerationParams.UtilitiesFolder.Equals(string.Empty))
@@ -2018,7 +2029,7 @@ namespace CslaGenerator.CodeGen
 
                 if (_unit.GenerationParams.GenerateDalObject)
                 {
-                    if (_unit.GenerationParams.TargetIsCsla5DAL)
+                    if (_unit.GenerationParams.TargetIsCsla5DAL || _unit.GenerationParams.TargetIsCsla6DAL)
                     {
                         if (_fileSuccess["IDalConfig" + dalName] == null)
                             OutputWindow.Current.AddOutputInfo(

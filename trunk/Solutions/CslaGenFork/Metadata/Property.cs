@@ -23,6 +23,7 @@ namespace CslaGenerator.Metadata
         private string _summary = string.Empty;
         private string _remarks = string.Empty;
         protected string _parameterName = string.Empty;
+        protected string _parameterSize = string.Empty;
         private bool _nullable;
 
         #region Constructors

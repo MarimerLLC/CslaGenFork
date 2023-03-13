@@ -11,6 +11,8 @@ namespace CslaGenerator.Metadata
         [Description("SQL Connection Unshared")]
         SqlConnectionUnshared = 2,
         LinqContext = 3,
-        EFContext = 4
+        EFContext = 4,
+        [Description("Injected SQL Connection")]
+        DISqlConnection = 5
     }
 }
