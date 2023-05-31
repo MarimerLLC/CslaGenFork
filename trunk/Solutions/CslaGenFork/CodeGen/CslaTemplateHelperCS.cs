@@ -355,7 +355,11 @@ namespace CslaGenerator.CodeGen
                 statement += " : null";
             }*/
 
-            if (assignDataType == TypeCodeEx.ByteArray)
+            if (assignDataType == TypeCodeEx.SmartDate && !string.IsNullOrEmpty(prop.Format))
+                statement += " with { FormatString = \"" + prop.Format + "\" }"; 
+
+
+                if (assignDataType == TypeCodeEx.ByteArray)
                 statement = statement + " as byte[]";
 
             return statement;

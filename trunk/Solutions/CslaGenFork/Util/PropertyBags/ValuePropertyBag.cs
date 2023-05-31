@@ -596,6 +596,12 @@ namespace CslaGenerator.Util.PropertyBags
                     propertyInfo.Name == "BackingFieldType")
                     isreadonly = true;
 
+                if (SelectedObject[0].DeclarationMode != PropertyDeclaration.ClassicPropertyWithTypeConversion &&
+                    SelectedObject[0].DeclarationMode != PropertyDeclaration.ManagedWithTypeConversion &&
+                    SelectedObject[0].DeclarationMode != PropertyDeclaration.UnmanagedWithTypeConversion &&
+                    propertyInfo.Name == "Format")
+                    isreadonly = true;
+
                 if (SelectedObject[0].ReadOnly &&
                     propertyInfo.Name == "PropSetAccessibility")
                     isreadonly = true;

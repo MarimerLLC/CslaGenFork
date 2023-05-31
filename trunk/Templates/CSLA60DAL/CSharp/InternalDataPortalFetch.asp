@@ -125,7 +125,7 @@ if (!Info.UseCustomLoading && !Info.DataSetLoadingScheme)
                 }
             }
         }
-        if (!UseChildFactoryHelper && Info.CheckRulesOnFetch && !Info.EditOnDemand && (!isRoot || Info.IsDynamicEditableRoot()))
+        if (!UseChildFactoryHelper && Info.CheckRulesOnFetch && !Info.EditOnDemand && (!isRoot || Info.IsDynamicEditableRoot()) && !SelfLoadsChildren(Info))
         {
             %>
             // check all object rules and property rules
@@ -538,6 +538,13 @@ if (!Info.UseCustomLoading && !Info.DataSetLoadingScheme)
                         }
                     }
                 }
+            }
+            if (Info.CheckRulesOnFetch && !Info.EditOnDemand && !TypeHelper.IsCollectionType(Info.ObjectType))
+            {
+                %>
+            // check all object rules and property rules
+            BusinessRules.CheckRules();
+            <%
             }
             %>
         }
