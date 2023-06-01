@@ -682,6 +682,17 @@ namespace CslaGenerator.Metadata
         }
 
         [Browsable(false)]
+        public bool TargetIsCsla60
+        {
+            get
+            {
+                return
+                    _targetFramework == TargetFramework.CSLA60 ||
+                    _targetFramework == TargetFramework.CSLA60DAL;
+            }
+        }
+
+        [Browsable(false)]
         public bool TargetIsCsla4
         {
             get
@@ -720,6 +731,26 @@ namespace CslaGenerator.Metadata
             {
                 return
                     _targetFramework == TargetFramework.CSLA50DAL;
+            }
+        }
+
+        [Browsable(false)]
+        public bool TargetIsCsla6
+        {
+            get
+            {
+                return
+                    _targetFramework == TargetFramework.CSLA60;
+            }
+        }
+
+        [Browsable(false)]
+        public bool TargetIsCsla6DAL
+        {
+            get
+            {
+                return
+                    _targetFramework == TargetFramework.CSLA60DAL;
             }
         }
 
@@ -795,7 +826,7 @@ namespace CslaGenerator.Metadata
             _generateDalInterface = false;
             _generateDalObject = false;
 
-            if (TargetIsCsla4DAL || TargetIsCsla5DAL)
+            if (TargetIsCsla4DAL || TargetIsCsla5DAL || TargetIsCsla6DAL)
             {
                 UseDal = true;
                 _generateDalInterface = true;

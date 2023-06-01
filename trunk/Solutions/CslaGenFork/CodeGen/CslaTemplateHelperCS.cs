@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Drawing;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -239,7 +240,10 @@ namespace CslaGenerator.CodeGen
                 if (info.DataSetLoadingScheme)
                     return GetDataSetLoaderStatement(prop);
 
-                if ((CurrentUnit.GenerationParams.TargetIsCsla4DAL || CurrentUnit.GenerationParams.TargetIsCsla5DAL) && CurrentUnit.GenerationParams.GenerateDTO)
+                if ((CurrentUnit.GenerationParams.TargetIsCsla4DAL || 
+                    CurrentUnit.GenerationParams.TargetIsCsla5DAL ||
+                    CurrentUnit.GenerationParams.TargetIsCsla6DAL) 
+                    && CurrentUnit.GenerationParams.GenerateDTO)
                     return GetDtoLoaderStatement(prop);
 
                 return GetDataReaderLoaderStatement(prop);
@@ -351,8 +355,70 @@ namespace CslaGenerator.CodeGen
                 statement += " : null";
             }*/
 
-            if (assignDataType == TypeCodeEx.ByteArray)
+            if (assignDataType == TypeCodeEx.SmartDate && !string.IsNullOrEmpty(prop.Format))
+                statement += " with { FormatString = \"" + prop.Format + "\" }"; 
+
+
+                if (assignDataType == TypeCodeEx.ByteArray)
                 statement = statement + " as byte[]";
+
+            return statement;
+        }
+
+        public virtual string GetDataRowStatement(ValueProperty prop)
+        {
+            TypeCodeEx assignDataType;
+            if (prop.BackingFieldType == TypeCodeEx.Empty)
+                assignDataType = prop.PropertyType;
+            else
+                assignDataType = prop.BackingFieldType;
+
+            var nullable = AllowNull(prop);
+            var statement = string.Empty;
+
+            //if (nullable)
+            //{
+            //    if (assignDataType.IsNullableType())
+            //    {
+            //        if (prop.DeclarationMode != PropertyDeclaration.ManagedWithTypeConversion &&
+            //            prop.DeclarationMode != PropertyDeclaration.ClassicPropertyWithTypeConversion &&
+            //            prop.DeclarationMode != PropertyDeclaration.UnmanagedWithTypeConversion)
+            //            statement += String.Format("({0})", GetDataType(prop));
+            //    }
+            //    else
+            //    {
+            //        statement += String.Format("dr.IsNull(\"{0}\") ? null : ", prop.ParameterName);
+            //    }
+            //}
+            if (assignDataType == TypeCodeEx.SmartDate)
+            {
+                statement += $"new SmartDate(dr.Field<DateTime?>(\"{prop.ParameterName}\").GetValueOrDefault());";
+            }
+            else
+            {
+                statement += $"dr.Field<{GetDataTypeGeneric(prop, assignDataType)}>(\"{prop.ParameterName}\")";
+            }
+
+            //if (prop.DbBindColumn.ColumnOriginType == ColumnOriginType.None)
+            //    statement += GetReaderMethod(assignDataType);
+            //else
+            //    statement += GetReaderMethod(prop.DbBindColumn.GetDbType(), prop);
+
+            //statement += "(\"" + prop.ParameterName + "\"";
+
+            //if (assignDataType == TypeCodeEx.SmartDate)
+            //    statement += ", true";
+
+            //statement += ")";
+            ///*if (nullable && !GeneralTemplatesHelper.IsNullableType(assignDataType))
+            //{
+            //    if (GeneralTemplatesHelper.IsNullableType(assignDataType))
+            //        statement += ")";
+            //    statement += " : null";
+            //}*/
+
+            //if (assignDataType == TypeCodeEx.ByteArray)
+            //    statement = statement + " as byte[]";
 
             return statement;
         }
@@ -878,7 +944,9 @@ namespace CslaGenerator.CodeGen
 
             // ignore if not usign DAL
             var dalInterfaceNamespaces = new List<string>();
-            if ((unit.GenerationParams.TargetIsCsla4DAL || unit.GenerationParams.TargetIsCsla5DAL) && !isUnitOfWork)
+            if ((unit.GenerationParams.TargetIsCsla4DAL || 
+                unit.GenerationParams.TargetIsCsla5DAL ||
+                unit.GenerationParams.TargetIsCsla6DAL) && !isUnitOfWork)
             {
                 dalInterfaceNamespaces.AddRange(GetDalInterfaceNamespaces(info, unit));
                 if (UseSilverlight())
@@ -952,7 +1020,9 @@ namespace CslaGenerator.CodeGen
             if (!string.IsNullOrEmpty(info.UpdaterType) ||
                 (!UseSilverlight() &&
                  !isUnitOfWork &&
-                 (CurrentUnit.GenerationParams.TargetIsCsla4DAL || CurrentUnit.GenerationParams.TargetIsCsla5DAL) &&
+                 (CurrentUnit.GenerationParams.TargetIsCsla4DAL || 
+                    CurrentUnit.GenerationParams.TargetIsCsla5DAL ||
+                    CurrentUnit.GenerationParams.TargetIsCsla6DAL) &&
                  CurrentUnit.GenerationParams.GenerateDTO &&
                  !info.ObjectType.IsObjectType()))
             {
@@ -967,9 +1037,13 @@ namespace CslaGenerator.CodeGen
 
             if (!UseSilverlight() && !isUnitOfWork)
             {
-                if ((!unit.GenerationParams.TargetIsCsla4DAL && !unit.GenerationParams.TargetIsCsla5DAL) || !unit.GenerationParams.GenerateDTO)
+                if ((!unit.GenerationParams.TargetIsCsla4DAL && 
+                    !unit.GenerationParams.TargetIsCsla5DAL &&
+                    !unit.GenerationParams.TargetIsCsla6DAL) || !unit.GenerationParams.GenerateDTO)
                     result.Add("System.Data");
-                if (!unit.GenerationParams.TargetIsCsla4DAL && !unit.GenerationParams.TargetIsCsla5DAL)
+                if (!unit.GenerationParams.TargetIsCsla4DAL && 
+                    !unit.GenerationParams.TargetIsCsla5DAL &&
+                    !unit.GenerationParams.TargetIsCsla6DAL)
                     result.AddRange(Namespaces);
             }
 
@@ -981,7 +1055,9 @@ namespace CslaGenerator.CodeGen
             if (!UseSilverlight() && !isUnitOfWork)
             {
                 result.Add("Csla");
-                if ((!unit.GenerationParams.TargetIsCsla4DAL && !unit.GenerationParams.TargetIsCsla5DAL) || !unit.GenerationParams.GenerateDTO)
+                if ((!unit.GenerationParams.TargetIsCsla4DAL && 
+                    !unit.GenerationParams.TargetIsCsla5DAL &&
+                    !unit.GenerationParams.TargetIsCsla6DAL) || !unit.GenerationParams.GenerateDTO)
                     result.Add("Csla.Data");
                 if (contextUtilitiesnamespace != string.Empty)
                     result.Add(contextUtilitiesnamespace);
@@ -991,7 +1067,7 @@ namespace CslaGenerator.CodeGen
                 result.Add("Csla");
             }
 
-            if (unit.GenerationParams.TargetIsCsla50)
+            if (unit.GenerationParams.TargetIsCsla50 || unit.GenerationParams.TargetIsCsla60)
             {
                 result.Add("System.ComponentModel");
                 result.Add("System.ComponentModel.DataAnnotations");
@@ -1137,10 +1213,14 @@ namespace CslaGenerator.CodeGen
         {
             var result = new List<string>();
 
-            if ((!unit.GenerationParams.TargetIsCsla4DAL && !unit.GenerationParams.TargetIsCsla5DAL) || !unit.GenerationParams.GenerateDTO)
+            if ((!unit.GenerationParams.TargetIsCsla4DAL && 
+                !unit.GenerationParams.TargetIsCsla5DAL &&
+                !unit.GenerationParams.TargetIsCsla6DAL) || !unit.GenerationParams.GenerateDTO)
                 result.Add("System.Data");
 
-            if (!unit.GenerationParams.TargetIsCsla4DAL && !unit.GenerationParams.TargetIsCsla5DAL)
+            if (!unit.GenerationParams.TargetIsCsla4DAL && 
+                !unit.GenerationParams.TargetIsCsla5DAL &&
+                !unit.GenerationParams.TargetIsCsla6DAL)
                 result.AddRange(Namespaces);
 
             if (CurrentUnit.GenerationParams.GenerateDTO && !info.ObjectType.IsObjectType())
@@ -1169,7 +1249,10 @@ namespace CslaGenerator.CodeGen
 
                 if (!usesDb)
                 {
-                    if ((CurrentUnit.GenerationParams.TargetIsCsla4DAL || CurrentUnit.GenerationParams.TargetIsCsla5DAL) && CurrentUnit.GenerationParams.GenerateDTO)
+                    if ((CurrentUnit.GenerationParams.TargetIsCsla4DAL || 
+                        CurrentUnit.GenerationParams.TargetIsCsla5DAL ||
+                        CurrentUnit.GenerationParams.TargetIsCsla6DAL) && 
+                        CurrentUnit.GenerationParams.GenerateDTO)
                         result.Add(GetContextObjectNamespace(info, unit, GenerationStep.DalInterface));
 
                     return result;
@@ -2516,8 +2599,13 @@ namespace CslaGenerator.CodeGen
 
         public static string GetDataTypeGeneric(Property prop, TypeCodeEx field)
         {
-            if (field == TypeCodeEx.CustomType && prop is ValueProperty)
-                return ((ValueProperty) prop).CustomPropertyType;
+            if (field == TypeCodeEx.CustomType)
+            {
+                if (prop is ValueProperty)
+                    return ((ValueProperty)prop).CustomPropertyType;
+                else if (prop is CriteriaProperty)
+                    return ((CriteriaProperty)prop).CustomPropertyType;
+            }              
 
             var type = GetDataType(field);
             if (AllowNull(prop) && prop.PropertyType != TypeCodeEx.CustomType)
@@ -3956,7 +4044,10 @@ namespace CslaGenerator.CodeGen
             if (!isDataPortalCreate && prop.DeclarationMode == PropertyDeclaration.AutoProperty)
                 return String.Format("{0} = {1}", FormatProperty(prop.Name), value);
 
-            value = String.Format("DataPortal.CreateChild<{0}>()", prop.TypeName);
+            if (CurrentUnit.GenerationParams.TargetIsCsla6DAL)
+                value = String.Format("childFactory.GetPortal<{0}>().CreateChild()", prop.TypeName);
+            else
+                value = String.Format("DataPortal.CreateChild<{0}>()", prop.TypeName);
 
             if (prop.DeclarationMode == PropertyDeclaration.ClassicProperty)
                 return String.Format("{0} = {1}", FormatFieldName(prop.Name), value);
@@ -3974,7 +4065,10 @@ namespace CslaGenerator.CodeGen
             if (prop.DeclarationMode == PropertyDeclaration.AutoProperty)
                 return String.Format("{0} = {1}", FormatProperty(prop.Name), value);
 
-            value = String.Format("DataPortal.FetchChild<{0}>()", prop.TypeName);
+            if (CurrentUnit.GenerationParams.TargetIsCsla6DAL)
+                value = String.Format("childFactory.GetPortal<{0}>().FetchChild()", prop.TypeName);
+            else
+                value = String.Format("DataPortal.FetchChild<{0}>()", prop.TypeName);
             return GetFieldLoaderStatement(prop, value);
         }
 
@@ -4063,7 +4157,7 @@ namespace CslaGenerator.CodeGen
                 response = String.Format("            get {{ return {0}; }}" + Environment.NewLine,
                     FormatFieldName(prop.Name));
             }
-
+            
             return response;
         }
 
@@ -4760,10 +4854,10 @@ namespace CslaGenerator.CodeGen
                 response = String.Format("                return {0};" + Environment.NewLine,
                     FormatProperty(prop.Name));
             }
-
+            
             return response;
         }
-
+        
         #endregion
 
         #region Unit of Work handling
@@ -4821,6 +4915,14 @@ namespace CslaGenerator.CodeGen
 
         #region Context Connection Manager
 
+        public static string AddIndent(bool needsIndent)
+        {
+            if (needsIndent)
+                return new string(' ', 4);
+
+            return string.Empty;
+        }
+
         public string GetConnection(CslaObjectInfo info, bool isFetch)
         {
             var database = "\"" + CurrentUnit.GenerationParams.DatabaseConnection + "\"";
@@ -4849,6 +4951,10 @@ namespace CslaGenerator.CodeGen
             {
                 response += "TransactionManager<" + ConnectionMethod + ", SqlTransaction>.GetManager(" + database + "))";
             }
+            else if (info.PersistenceType == PersistenceType.DISqlConnection)
+            {
+                response += "DalDb.GetConnection())";
+            }
             else
             {
                 response += "ConnectionManager<" + ConnectionMethod + ">.GetManager(" + database + "))";
@@ -4869,7 +4975,7 @@ namespace CslaGenerator.CodeGen
 
                 return result;
             }
-
+            
             return GetCommand(info, commandText);
         }
 
@@ -4901,6 +5007,8 @@ namespace CslaGenerator.CodeGen
         {
             if (info.PersistenceType == PersistenceType.SqlConnectionUnshared)
                 return "cn";
+            else if (info.PersistenceType == PersistenceType.DISqlConnection)
+                return "ctx";
 
             return "ctx.Connection";
         }
@@ -5322,6 +5430,10 @@ namespace CslaGenerator.CodeGen
                 info.GenerateDataPortalUpdate)
             {
                 hookList.AddRange(new[] {"UpdatePre", "UpdatePost"});
+                if (info.AllChildProperties.Count > 0)
+                {
+                    hookList.Add("UpdateChildrenPost");
+                }
             }
 
             if (info.ObjectType.IsEditableType() &&
@@ -5329,6 +5441,10 @@ namespace CslaGenerator.CodeGen
                 info.GenerateDataPortalInsert)
             {
                 hookList.AddRange(new[] {"InsertPre", "InsertPost"});
+                if (info.AllChildProperties.Count > 0)
+                {
+                    hookList.Add("InsertChildrenPost");
+                }
             }
 
             return hookList;
@@ -5359,12 +5475,20 @@ namespace CslaGenerator.CodeGen
                     response +=
                         "in DataPortal_Insert, after the insert operation, before setting back row identifiers (ID and RowVersion) and Commit().";
                     break;
+                case "InsertChildrenPost":
+                    response +=
+                        "in DataPortal_Insert, after the insert operation and after the children have been updated, before setting back row identifiers (ID and RowVersion) and Commit().";
+                    break;
                 case "UpdatePre":
                     response += "after setting query parameters and before the update operation.";
                     break;
                 case "UpdatePost":
                     response +=
                         "in DataPortal_Insert, after the update operation, before setting back row identifiers (RowVersion) and Commit().";
+                    break;
+                case "UpdateChildrenPost":
+                    response +=
+                        "in DataPortal_Insert, after the update operation and after the children have been updated, before setting back row identifiers (RowVersion) and Commit().";
                     break;
                 case "DeletePre":
                     response += "in DataPortal_Delete, after setting query parameters and before the delete operation.";

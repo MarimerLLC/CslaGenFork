@@ -90,6 +90,7 @@ namespace CslaGenerator.Metadata
         private string _fkConstraint = string.Empty;
         private bool _undoable = true;
         private string _defaultValue = string.Empty;
+        private string _format = string.Empty;
         private string _outputParameterFunction = string.Empty;
         private string _friendlyName = string.Empty;
         private bool _isDatabaseBound = true;
@@ -224,6 +225,25 @@ namespace CslaGenerator.Metadata
             set { _parameterName = value; }
         }
 
+        [Category("00. Database")]
+        [Description("The stored procedure parameter size.")]
+        [UserFriendlyName("Parameter Size")]
+        public string ParameterSize
+        {
+            get
+            {
+                if (_parameterSize.Equals(String.Empty))
+                {
+                    if (DbBindColumn.Size > 0)
+                        return DbBindColumn.Size.ToString();
+
+                    return string.Empty;
+                }
+                return _parameterSize;
+            }
+            set { _parameterSize = value; }
+        }
+
         #endregion
 
         #region 01. Definition
@@ -343,6 +363,15 @@ namespace CslaGenerator.Metadata
 
                 _backingFieldType = value;
             }
+        }
+
+        [Category("01. Definition")]
+        [Description("Format string for Smart Dates. Is set to read only when the Declaration Mode isn't using type conversion.")]
+        [UserFriendlyName("Format")]
+        public virtual string Format
+        {
+            get { return _format; }
+            set { _format = value.Trim(); }
         }
 
         [Category("01. Definition")]

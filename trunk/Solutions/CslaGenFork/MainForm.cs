@@ -769,6 +769,7 @@ namespace CslaGenerator
             forceBackingFieldSmartDate.Enabled = true;
             convertPropertiesAndCriteriaToSilverlight.Enabled = true;
             convertProjectToNewPublicPolicy.Enabled = true;
+            convertPersistenceTypeToDiSqlConnection.Enabled = true;
 
             ConditonalButtonsAndMenus();
         }
@@ -1726,6 +1727,25 @@ namespace CslaGenerator
 
             _outputPanel.AddOutputInfo(Environment.NewLine +
                                        "Convert Constructors and PropertyInfo to Public is done." +
+                                       Environment.NewLine);
+        }
+
+        private void ConvertPersistenceTypeToDiSqlConnection(object sender, EventArgs e)
+        {
+            _outputPanel.AddOutputInfo(Environment.NewLine +
+                                       "Converting Objects to use DI SqlConnection..." +
+                                       Environment.NewLine);
+            foreach (var info in _controller.CurrentUnit.CslaObjects)
+            {
+                if (info.IsBaseClass() || info.IsPlaceHolder())
+                    continue;
+
+                info.PersistenceType = PersistenceType.DISqlConnection;
+
+                _outputPanel.AddOutputInfo(info.ObjectName + ": converted to use DI SqlConnection");
+            }
+            _outputPanel.AddOutputInfo(Environment.NewLine +
+                                       "Convert Objects to use DI SqlConnection is done." +
                                        Environment.NewLine);
         }
 
