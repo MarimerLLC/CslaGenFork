@@ -34,7 +34,7 @@ if (!Info.UseCustomLoading && !Info.DataSetLoadingScheme)
         /// </summary>
         /// <param name="<%= usesDTO ? "data" : "dr" %>">The <%= usesDTO ? (Info.ObjectName + "Dto") : "SafeDataReader" %> to use.</param>
 		<%= dataPortalFetch %>
-		private void <%= methodFetchString %>Fetch(<%= usesDTO ? (Info.ObjectName + "Dto data") : "SafeDataReader dr" %><%= (Info.GetCollectionChildProperties().Count > 0 && ancestorLoaderLevel > 0) ? ", [Inject] IChildDataPortalFactory childFactory" : "" %>)
+		private void Fetch(<%= usesDTO ? (Info.ObjectName + "Dto data") : "SafeDataReader dr" %><%= (Info.GetCollectionChildProperties().Count > 0 && ancestorLoaderLevel > 0) ? ", [Inject] IChildDataPortalFactory childFactory" : "" %>)
         {
             // Value properties
             <%

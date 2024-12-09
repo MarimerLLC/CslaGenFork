@@ -331,10 +331,10 @@ namespace CslaGenerator.CodeGen
             {
                 if (property.DbBindColumn != null)
                 {
-                    var table = property.DbBindColumn.DatabaseObject;
-                    if (table != null && !tableNames.Contains(table.ObjectName))
+                    var table = property.DbBindColumn.DatabaseObject as IResultObject;
+                    if (table != null &&  !tableNames.Contains(table.ObjectName))
                     {
-                        objectTables.Add((IResultObject) property.DbBindColumn.DatabaseObject);
+                        objectTables.Add(table);
                         tableNames.Add(table.ObjectName);
                     }
                 }

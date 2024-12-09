@@ -115,3 +115,4 @@ UpgradeLog*.XML
 
 Desktop.ini
 CodeSmith.Engine.dll
+/trunk/Solutions/DBSchemaInfo/.cr/personal/FavoritesList/List.xml
