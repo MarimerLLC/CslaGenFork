@@ -63,7 +63,8 @@ if (!Info.UseCustomLoading && !Info.DataSetLoadingScheme)
         <%
             if (c.Properties.Count > 0)
             {
-        %><%= strGetComment %>
+        %>
+        <%= strGetComment %>
         <%
             }
             string dataPortalFetch = string.Empty;
